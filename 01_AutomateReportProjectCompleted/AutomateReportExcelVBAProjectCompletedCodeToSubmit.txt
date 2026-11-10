@@ -1,0 +1,73 @@
+function main(workbook: ExcelScript.Workbook) {
+	let sheet1 = workbook.getWorksheet("Sheet1");
+	// Rename worksheet to "Executive_Report"
+	sheet1.setName("Executive_Report");
+	let executive_Report = workbook.getWorksheet("Executive_Report");
+	// Auto fit the columns of all cells on executive_Report
+	executive_Report.getRange().getFormat().autofitColumns();
+	// Text to columns on range A1:A11 on executive_Report
+	for (let row = 0; row < executive_Report.getRange("A1:A11").getRowCount(); row++) {
+		let sourceRange = executive_Report.getRange("A1:A11");
+		let destinationRange = executive_Report.getRange("B1");
+		let sourceRangeValues = sourceRange.getRow(row).getValues()[0][0].toString().split(/[,]/)
+		destinationRange.getOffsetRange(row, 0).getResizedRange(0, sourceRangeValues.length - 1).setValues([sourceRangeValues]);
+	}
+
+
+	// Delete Column A
+	executive_Report.getRange("A:A").delete(ExcelScript.DeleteShiftDirection.left);
+
+	// Auto fit the columns of all cells on executive_Report
+	executive_Report.getRange().getFormat().autofitColumns();
+	// Insert at range 1:1 on executive_Report, move existing cells down
+	executive_Report.getRange("1:1").insert(ExcelScript.InsertShiftDirection.down);
+	// Set horizontal alignment to ExcelScript.HorizontalAlignment.centerAcrossSelection for range B1:F1 on executive_Report
+	executive_Report.getRange("B1:F1").getFormat().setHorizontalAlignment(ExcelScript.HorizontalAlignment.centerAcrossSelection);
+	// Indent set to 0 for range B1:F1 on executive_Report
+	executive_Report.getRange("B1:F1").getFormat().setIndentLevel(0);
+	// Set range B1 on executive_Report
+	executive_Report.getRange("B1").setValue("MONTHLY EMPLOYEE PERFORMANCE AND SALARY REPORT");
+	// Set fill color to #002060 for range B1:F1 on executive_Report
+	executive_Report.getRange("B1:F1").getFormat().getFill().setColor("#002060");
+	// Set font color to "#FFFFFF" for range B1:F2 on executive_Report
+	executive_Report.getRange("B1:F2").getFormat().getFont().setColor("#FFFFFF");
+	// Set font color to "#FFFFFF" for range A2 on executive_Report
+	executive_Report.getRange("A2").getFormat().getFont().setColor("#FFFFFF");
+	// Set font bold to true for range B1:F2 on executive_Report
+	executive_Report.getRange("B1:F2").getFormat().getFont().setBold(true);
+	// Set font bold to true for range A2 on executive_Report
+	executive_Report.getRange("A2").getFormat().getFont().setBold(true);
+	// Set font size to 12 for range B1:F2 on executive_Report
+	executive_Report.getRange("B1:F2").getFormat().getFont().setSize(12);
+	// Set font size to 12 for range A2 on executive_Report
+	executive_Report.getRange("A2").getFormat().getFont().setSize(12);
+	// Set height of row(s) at range 1:1 on executive_Report to 27
+	executive_Report.getRange("1:1").getFormat().setRowHeight(27);
+	// Set fill color to #0070c0 for range A2:F2 on executive_Report
+	executive_Report.getRange("A2:F2").getFormat().getFill().setColor("#0070c0");
+	// Insert at range F:F on executive_Report, move existing cells right
+	executive_Report.getRange("F:F").insert(ExcelScript.InsertShiftDirection.right);
+	// Set range F2:F3 on executive_Report
+	executive_Report.getRange("F2:F3").setFormulas([["Age"], ["=INT(YEARFRAC(G3,TODAY()))"]]);
+	// Set format for range F:F on executive_Report
+	executive_Report.getRange("F:F").setNumberFormatLocal("0;[Red]0");
+	// Auto fill range
+	executive_Report.getRange("F3").autoFill("F3:F12", ExcelScript.AutoFillType.fillDefault);
+
+	// Zebra Striping   Loop 
+
+	let lastRowData = executive_Report.getUsedRange().getRowCount();
+	for (let r = 2; r < lastRowData; r++) {
+		let rowRange = executive_Report.getRangeByIndexes(r, 0, 1, executive_Report.getUsedRange().getColumnCount());
+		if (r % 2 === 0) {
+			rowRange.getFormat().getFill().setColor("#EBF3FC"); // Light tint
+		} else {
+			rowRange.getFormat().getFill().setColor("#FFFFFF"); // White
+		}
+	}
+
+
+
+	// Deselect by moving active focus to cell A1
+	executive_Report.getRange("A1").select();
+}
